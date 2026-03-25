@@ -793,7 +793,8 @@ search_dir (const struct dir_entry *entry)
 		error (0, errno, _("Cannot stat %s"), file_name);
 
 	      /* Remove stale symlinks.  */
-	      if (opt_link && strstr (direntry->d_name, ".so."))
+	      if (opt_link && (strstr (direntry->d_name, ".so.")
+			      || strstr (direntry->d_name, ".rdl.")))
 		unlink (real_file_name);
 
 	      if (opt_chroot != NULL)
@@ -820,7 +821,8 @@ search_dir (const struct dir_entry *entry)
 	  real_name = chroot_canon (opt_chroot, file_name);
 	  if (real_name == NULL)
 	    {
-	      if (strstr (file_name, ".so") == NULL)
+	      if (strstr (file_name, ".so") == NULL
+		  && strstr (file_name, ".rdl") == NULL)
 		error (0, 0, _("Input file %s not found.\n"), file_name);
 	      goto next;
 	    }
@@ -890,7 +892,8 @@ search_dir (const struct dir_entry *entry)
 	    {
 	      len = strlen (real_base_name);
 	      if (len < strlen (".so")
-		  || strcmp (real_base_name + len - strlen (".so"), ".so") != 0
+		  || (strcmp (real_base_name + len - strlen (".so"), ".so") != 0
+		      && strcmp (real_base_name + len - strlen (".rdl"), ".rdl") != 0)
 		  || strncmp (real_base_name, soname, len) != 0)
 		is_link = 0;
 	    }

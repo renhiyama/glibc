@@ -29,6 +29,11 @@ ifneq "$(origin +included-Makeconfig)" "file"
 
 +included-Makeconfig := yes
 
+# Shared and static library file extensions.
+# These can be overridden by OS-specific sysdeps (e.g., RunixOS uses .rdl/.ral).
+shared-lib-ext ?= .so
+static-lib-ext ?= .a
+
 ifdef subdir
 .. := ../
 endif
@@ -1254,7 +1259,7 @@ $(common-objpfx)soversions.mk: $(common-objpfx)soversions.i $(..)Makeconfig
 	   test x"$$which" = xDEFAULT || continue; \
 	   case $$number in \
 	     [0-9]*) echo "$$lib.so-version=.$$number"; \
-		     echo "all-sonames+=$$lib=$$lib.so\$$($$lib.so-version)";;\
+		     echo "all-sonames+=$$lib=$$lib$(shared-lib-ext)\$$($$lib.so-version)";;\
 	     *)	     echo "$$lib.so-version=$$number"; \
 		     echo "all-sonames+=$$lib=\$$($$lib.so-version)";;\
 	   esac; \
@@ -1383,12 +1388,12 @@ ifndef rtld-installed-name
 ifdef ld.so-version
 rtld-installed-name = $(ld.so-version)
 else
-rtld-installed-name = ld.so.1
+rtld-installed-name = ld$(shared-lib-ext).1
 endif
 endif
 
 ifndef rtld-version-installed-name
-rtld-version-installed-name = ld-$(version).so
+rtld-version-installed-name = ld-$(version)$(shared-lib-ext)
 endif
 
 endif # build-shared

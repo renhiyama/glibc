@@ -548,7 +548,7 @@ $(LINK.o) -shared -static-libgcc -Wl,-O1 $(sysdep-LDFLAGS) \
 	  $(if $($(@F)-no-dt-relr),$(no-dt-relr-ldflag),$(dt-relr-ldflag)) \
 	  $(extra-B-$(@F:lib%.so=%).so) -B$(csu-objpfx) \
 	  $(extra-B-$(@F:lib%.so=%).so) $(load-map-file) \
-	  -Wl,-soname=lib$(libprefix)$(@F:lib%.so=%).so$($(@F)-version) \
+	  -Wl,-soname=lib$(libprefix)$(@F:lib%.so=%)$(shared-lib-ext)$($(@F)-version) \
 	  $(LDFLAGS.so) $(LDFLAGS-lib.so) $(LDFLAGS-$(@F:lib%.so=%).so) \
 	  -L$(subst :, -L,$(rpath-link)) -Wl,-rpath-link=$(rpath-link)
 endef
@@ -1022,7 +1022,7 @@ $(inst_libdir)/libc.so: $(common-objpfx)format.lds \
 	 echo '   Use the shared library, but some functions are only in';\
 	 echo '   the static library, so try that secondarily.  */';\
 	 cat $<; \
-	 echo 'GROUP ( $(slibdir)/libc.so$(libc.so-version)' \
+	 echo 'GROUP ( $(slibdir)/libc$(shared-lib-ext)$(libc.so-version)' \
 	      '$(libdir)/$(patsubst %,$(libtype.oS),$(libprefix)$(libc-name))'\
 	      ' AS_NEEDED (' $(rtlddir)/$(rtld-installed-name) ') )' \
 	) > $@.new
@@ -1171,6 +1171,47 @@ install-no-libc.a-nosubdir: install-bin-nosubdir install-bin-script-nosubdir \
 			    install-others-programs-nosubdir
 endif
 install: install-no-libc.a-nosubdir
+
+# Rename installed libraries when using custom extensions (e.g., RunixOS .rdl/.ral).
+ifneq ($(shared-lib-ext),.so)
+install: install-rename-lib-extensions
+.PHONY: install-rename-lib-extensions
+install-rename-lib-extensions: install-no-libc.a-nosubdir
+	cd $(inst_slibdir) && \
+	for f in *.so.*; do \
+	  [ -f "$$f" ] || continue; \
+	  new=$$(echo "$$f" | sed 's/\.so\./$(shared-lib-ext)\./'); \
+	  [ "$$f" = "$$new" ] && continue; \
+	  mv -f "$$f" "$$new"; \
+	done; \
+	for f in *.so; do \
+	  [ -f "$$f" ] || [ -L "$$f" ] || continue; \
+	  new=$$(echo "$$f" | sed 's/\.so$$/$(shared-lib-ext)/'); \
+	  if [ -L "$$f" ]; then \
+	    target=$$(readlink "$$f" | sed 's/\.so/$(shared-lib-ext)/g'); \
+	    rm -f "$$f" "$$new"; \
+	    ln -s "$$target" "$$new"; \
+	  else \
+	    mv -f "$$f" "$$new"; \
+	  fi; \
+	done
+endif
+ifneq ($(static-lib-ext),.a)
+install: install-rename-static-extensions
+.PHONY: install-rename-static-extensions
+install-rename-static-extensions: install-no-libc.a-nosubdir
+	cd $(inst_libdir) && \
+	for f in lib*.a; do \
+	  [ -f "$$f" ] || continue; \
+	  new=$$(echo "$$f" | sed 's/\.a$$/$(static-lib-ext)/'); \
+	  mv -f "$$f" "$$new"; \
+	done; \
+	for f in *.rdl *.so; do \
+	  [ -f "$$f" ] || continue; \
+	  head -1 "$$f" | grep -q '/\*' || continue; \
+	  sed -i 's/\.so/$(shared-lib-ext)/g; s/\.a\b/$(static-lib-ext)/g' "$$f"; \
+	done
+endif
 
 # Command to compile $< using the native libraries.
 define native-compile

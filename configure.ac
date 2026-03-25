@@ -395,7 +395,7 @@ fi
 # $host_os of `gnu*' here to be `gnu-gnu*' just so that it can tell.
 # This doesn't get used much beyond that, so it's fairly safe.
 case "$host_os" in
-linux*)
+linux* | runixos*)
   ;;
 gnu*)
   host_os=`echo $host_os | sed -e 's/gnu/gnu-gnu/'`
@@ -503,7 +503,7 @@ LIBC_PRECONFIGURE([$srcdir], [for sysdeps])
 ###
 if test -z "$enable_hacker_mode" && test x"$libc_config_ok" != xyes; then
   case "$machine-$host_os" in
-  *-linux* | *-gnu*)
+  *-linux* | *-gnu* | *-runixos*)
     ;;
   *)
     AC_MSG_ERROR([
@@ -916,7 +916,7 @@ os="`echo $os | sed 's/\([0-9A-Z]\)[v_]\([0-9A-Z]\)/\1.\2/g'`"
 test "x$base_os" != x || case "$os" in
 gnu*)
   base_os=mach/hurd ;;
-linux*)
+linux* | runixos*)
   base_os=unix/sysv ;;
 esac
 

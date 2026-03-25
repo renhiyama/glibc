@@ -19,15 +19,17 @@
 #include <stdbool.h>
 #include <string.h>
 
-/* Returns true if the file name looks like a DSO name.  */
+/* Returns true if the file name looks like a DSO name.
+   Recognizes both standard .so and RunixOS .rdl extensions.  */
 static bool
 _dl_is_dso (const char *name)
 {
-  /* Recognize lib*.so*, ld-*.so*, ld.so.*, ld64.so.*.  ld-*.so*
-     matches both platform dynamic linker names like ld-linux.so.2,
-     and versioned dynamic loader names like ld-2.12.so.  */
+  bool has_dso_ext = (strstr (name, ".so") != NULL
+                      || strstr (name, ".rdl") != NULL);
   return (((strncmp (name, "lib", 3) == 0 || strncmp (name, "ld-", 3) == 0)
-           && strstr (name, ".so") != NULL)
+           && has_dso_ext)
           || strncmp (name, "ld.so.", 6) == 0
-          || strncmp (name, "ld64.so.", 8) == 0);
+          || strncmp (name, "ld64.so.", 8) == 0
+          || strncmp (name, "ld.rdl.", 7) == 0
+          || strncmp (name, "ld64.rdl.", 9) == 0);
 }

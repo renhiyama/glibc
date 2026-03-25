@@ -1,0 +1,9 @@
+# RunixOS uses custom library extensions:
+#   .rdl = RunixOS Dynamic Library (shared)
+#   .ral = RunixOS Archive Library (static)
+shared-lib-ext = .rdl
+static-lib-ext = .ral
+
+# RunixOS has no separate sbin — everything goes to bindir.
+sbindir = $(bindir)
+rootsbindir = $(bindir)
