@@ -1,0 +1,7 @@
+DEFAULT			GLIBC_2.17
+
+%ifdef HAVE_AARCH64_BE
+ld=ld-runixos-aarch64_be.rdl.1
+%else
+ld=ld-runixos-aarch64.rdl.1
+%endif
