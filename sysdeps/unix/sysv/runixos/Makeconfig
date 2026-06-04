@@ -4,7 +4,7 @@
 shared-lib-ext = .rdl
 static-lib-ext = .ral
 
-# RunixOS has no separate sbin — everything goes to bindir.
+# RunixOS has no separate sbin - everything goes to bindir.
 sbindir = $(bindir)
 rootsbindir = $(bindir)
 
