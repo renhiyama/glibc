@@ -2228,6 +2228,9 @@ LIBC_CONFIG_VAR([enable-gsframe], [$enable_gsframe])
 # Set the `multidir' variable by grabbing the variable from the compiler.
 # We do it once and save the result in a generated makefile.
 libc_cv_multidir=`${CC-cc} $CFLAGS $CPPFLAGS -print-multi-directory`
+# clang prints an empty multi-directory where gcc prints "."; normalise so the
+# multidir symlink rule is skipped instead of running with an empty path.
+test -n "$libc_cv_multidir" || libc_cv_multidir=.
 AC_SUBST(libc_cv_multidir)
 
 AC_SUBST(profile)
