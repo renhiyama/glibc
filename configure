@@ -6516,6 +6516,15 @@ if test $o != $tail; then
   ostry="$ostry /$o"
 fi
 
+# For linux-runixos, prefer the runixos sysdeps layer. The "-.*$" strip above
+# reduces "linux-runixos" to "linux" and loses the runixos part, so add it back
+# at the front: sysdeps/unix/sysv/runixos Implies unix/sysv/linux, so RunixOS
+# overrides (.rdl soname, ld-runixos linker, LibKit paths) take precedence.
+case $os in
+*-runixos*)
+  ostry="runixos /$ostry" ;;
+esac
+
 # For unix/sysv/sysv4, try unix/sysv/sysv4, then unix/sysv, then unix.
 base=
 tail=$base_os

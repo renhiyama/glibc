@@ -10,5 +10,5 @@ rootsbindir = $(bindir)
 
 # RunixOS renames ld.so.conf → LibKit.conf
 # ld.so.cache → LibKit.cache is handled via sysdeps/unix/sysv/runixos/dl-cache.h
-CFLAGS-.o += -DLD_SO_CONF='\"$(sysconfdir)/LibKit.conf\"'
-CFLAGS-.os += -DLD_SO_CONF='\"$(sysconfdir)/LibKit.conf\"'
+CFLAGS-.o += -DLD_SO_CONF='"$(sysconfdir)/LibKit.conf"'
+CFLAGS-.os += -DLD_SO_CONF='"$(sysconfdir)/LibKit.conf"'
