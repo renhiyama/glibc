@@ -8,7 +8,7 @@ static-lib-ext = .ral
 sbindir = $(bindir)
 rootsbindir = $(bindir)
 
-# RunixOS renames ld.so.conf → LibKit.conf
-# ld.so.cache → LibKit.cache is handled via sysdeps/unix/sysv/runixos/dl-cache.h
-CFLAGS-.o += -DLD_SO_CONF='"$(sysconfdir)/LibKit.conf"'
-CFLAGS-.os += -DLD_SO_CONF='"$(sysconfdir)/LibKit.conf"'
+# RunixOS renames ld.so.conf -> LibKit.conf. Only ldconfig.c consumes LD_SO_CONF,
+# so scope the define to that file instead of every object in the tree.
+# ld.so.cache -> LibKit.cache is handled via sysdeps/unix/sysv/runixos/dl-cache.h.
+CFLAGS-ldconfig.c += -DLD_SO_CONF='"$(sysconfdir)/LibKit.conf"'

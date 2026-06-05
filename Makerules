@@ -1172,11 +1172,17 @@ install-no-libc.a-nosubdir: install-bin-nosubdir install-bin-script-nosubdir \
 endif
 install: install-no-libc.a-nosubdir
 
-# Rename installed libraries when using custom extensions (e.g., RunixOS .rdl/.ral).
+# Rename installed libraries when using custom extensions (e.g. RunixOS .rdl/.ral).
+# glibc's install rules hardcode .so/.a filenames, while the SONAMEs are already
+# emitted with the custom extension (shlib-versions/soversions). This renames the
+# installed files to match. Guarded to the top-level make (ifndef subdir) so the
+# global rename runs exactly once, and ordered after subdir_install so libraries
+# installed by subdirs (libm, libdl, ...) are present before the rename.
+ifndef subdir
 ifneq ($(shared-lib-ext),.so)
 install: install-rename-lib-extensions
 .PHONY: install-rename-lib-extensions
-install-rename-lib-extensions: install-no-libc.a-nosubdir
+install-rename-lib-extensions: install-no-libc.a-nosubdir subdir_install
 	cd $(inst_slibdir) && \
 	for f in *.so.*; do \
 	  [ -f "$$f" ] || continue; \
@@ -1199,7 +1205,7 @@ endif
 ifneq ($(static-lib-ext),.a)
 install: install-rename-static-extensions
 .PHONY: install-rename-static-extensions
-install-rename-static-extensions: install-no-libc.a-nosubdir
+install-rename-static-extensions: install-no-libc.a-nosubdir subdir_install
 	cd $(inst_libdir) && \
 	for f in lib*.a; do \
 	  [ -f "$$f" ] || continue; \
@@ -1211,6 +1217,7 @@ install-rename-static-extensions: install-no-libc.a-nosubdir
 	  head -1 "$$f" | grep -q '/\*' || continue; \
 	  sed -i 's/\.so/$(shared-lib-ext)/g; s/\.a\b/$(static-lib-ext)/g' "$$f"; \
 	done
+endif
 endif
 
 # Command to compile $< using the native libraries.
