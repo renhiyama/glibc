@@ -40,8 +40,10 @@
    except through the auto-generated lib-names.h and some static
    pointer manipulation.  The "-1" accounts for the trailing NUL
    included in the sizeof.  */
+/* RunixOS shared libraries use the .rdl suffix, so LIBNSS_FILES_SO is
+   "libnss_files.rdl.2"; skip past "libnss_files.rdl" to get the ".2" revision. */
 static const char *const __nss_shlib_revision
-	= &LIBNSS_FILES_SO[sizeof("libnss_files.so") - 1];
+	= &LIBNSS_FILES_SO[sizeof("libnss_files.rdl") - 1];
 
 /* A single-linked list used to implement a mapping from service names
    to NSS modules.  (Most systems only use five or so modules, so a
@@ -177,7 +179,7 @@ module_load (struct nss_module *module)
   void *handle;
   {
     char *shlib_name;
-    if (__asprintf (&shlib_name, "libnss_%s.so%s",
+    if (__asprintf (&shlib_name, "libnss_%s.rdl%s",
                     module->name, __nss_shlib_revision) < 0)
       /* This is definitely a temporary failure.  Do not update
          module->state.  This will trigger another attempt at the next
