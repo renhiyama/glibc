@@ -5218,7 +5218,7 @@ if test $ac_verc_fail = yes; then
 fi
 
     ;;
-  "LLD"*)
+  *"LLD"*)
   # Accept LLD 13.0.0 or higher
     for ac_prog in $LD
 do
